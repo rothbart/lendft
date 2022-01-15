@@ -1,4 +1,17 @@
-.App {
+.app {
   text-align: center;
   margin-top: 32px;
+}
+
+.table {
+  margin: auto;
+}
+
+.columnheader {
+  text-decoration: underline;
+  padding-bottom: 16px;
+}
+
+.cell {
+  padding: 8px;
 }
