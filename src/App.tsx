@@ -108,7 +108,7 @@ function App() {
               {Object.keys(SITE_PAGES_INFO).map((pageKey) => {
                 return (
                   <Typography variant="h6" component="span" key={pageKey}>
-                    <Link to={SITE_PAGES_INFO[pageKey].route}>
+                    <Link to={SITE_PAGES_INFO[pageKey].route} style={{textDecoration: "none"}}>
                       <Button sx={{ mx: 2, color: "white"}}>
                         { SITE_PAGES_INFO[pageKey].name }
                       </Button>
