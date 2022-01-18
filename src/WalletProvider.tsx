@@ -18,7 +18,7 @@ const WalletContext = createContext<WalletContextType | null>(null);
 export const useWallet = () => useContext(WalletContext);
 
 interface WalletProviderProps {
-  children: any;
+  children: unknown;
 }
 const WalletProvider: FunctionComponent<WalletProviderProps> = (props) => {
   const [loaded, setLoaded] = useState(false);
@@ -40,7 +40,6 @@ const WalletProvider: FunctionComponent<WalletProviderProps> = (props) => {
           address,
           isRinkeby: network.name === "rinkeby",
         });
-      } catch (err) {
       } finally {
         setLoaded(true);
       }

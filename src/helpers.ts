@@ -1,8 +1,19 @@
 import axios, { AxiosRequestConfig } from "axios";
 
+interface Asset {
+  name?: string;
+  id?: number;
+  image_thumbnail_url?: string;
+  permalink?: string;
+  asset_contract?: {
+    address?: string;
+    asset_contract_type?: string;
+  };
+}
+
 export async function getNFTs(owner: string, testNetwork: boolean) {
   // https://docs.opensea.io/reference/getting-assets
-  var config: AxiosRequestConfig = {
+  const config: AxiosRequestConfig = {
     method: "get",
     url: testNetwork
       ? `https://testnets-api.opensea.io/api/v1/assets`
@@ -16,15 +27,15 @@ export async function getNFTs(owner: string, testNetwork: boolean) {
 
   const res = await axios(config);
 
-  const tokenData: any[] = res.data?.assets || [];
+  const tokenData: Asset[] = res.data?.assets || [];
 
   return tokenData.map((tokenData) => ({
-    name: tokenData?.name,
-    id: tokenData?.id,
-    image_url: tokenData?.image_thumbnail_url,
-    permalink: tokenData?.permalink,
-    contract_address: tokenData?.asset_contract?.address,
-    type: tokenData?.asset_contract?.asset_contract_type,
+    name: tokenData.name,
+    id: tokenData.id,
+    image_url: tokenData.image_thumbnail_url,
+    permalink: tokenData.permalink,
+    contract_address: tokenData.asset_contract?.address,
+    type: tokenData.asset_contract?.asset_contract_type,
   }));
 }
 export type NFTList = Awaited<ReturnType<typeof getNFTs>>;
