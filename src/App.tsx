@@ -33,7 +33,7 @@ function renderNFTs(nfts: NFTList) {
       <tbody>
         {nfts.map((nft) => {
           return (
-            <tr>
+            <tr key={nft.name}>
               <th scope="row" className="cell">
                 <img src={nft.image_url} alt="nft" />
               </th>
