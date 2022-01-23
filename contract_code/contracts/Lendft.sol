@@ -51,7 +51,7 @@ contract Lendft {
         uint loanId = loans.length;
 
         IERC721 tokenContract = IERC721(nftContractAddress);
-        tokenContract.safeTransferFrom(msg.sender, address(this), nftId);
+        tokenContract.transferFrom(msg.sender, address(this), nftId);
 
         Loan memory loan = Loan(
             loanId, 

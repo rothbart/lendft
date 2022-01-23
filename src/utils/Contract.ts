@@ -22,7 +22,7 @@ const createPendingLoan = async (wallet: any, principal: number, interestRate: n
 
     try { 
         const approveTransaction = await erc721Contract.approve(LENDFT_ADDRESS, nftId);
-        approveTransaction.wait();
+        await approveTransaction.wait();
     } catch (err) {
         console.log(err);
         throw err;
@@ -36,7 +36,7 @@ const createPendingLoan = async (wallet: any, principal: number, interestRate: n
             nftId,
             maturityInSeconds
         )
-        const returnValue = transaction.wait();
+        const returnValue = await transaction.wait();
 
         console.log("RETURN VALUE", returnValue);
 

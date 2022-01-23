@@ -3,6 +3,7 @@ import axios, { AxiosRequestConfig } from "axios";
 interface Asset {
   name?: string;
   id?: number;
+  token_id: string;
   image_thumbnail_url?: string;
   permalink?: string;
   asset_contract?: {
@@ -29,9 +30,12 @@ export async function getNFTs(owner: string, testNetwork: boolean) {
 
   const tokenData: Asset[] = res.data?.assets || [];
 
+  console.log("tokendata");
+  console.log(tokenData);
+
   return tokenData.map((tokenData) => ({
     name: tokenData.name,
-    id: tokenData.id,
+    id: parseInt(tokenData.token_id),
     image_url: tokenData.image_thumbnail_url,
     permalink: tokenData.permalink,
     contract_address: tokenData.asset_contract?.address,
