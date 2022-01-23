@@ -2,8 +2,6 @@ import { ethers } from 'ethers';
 
 import { LENDFT_ADDRESS, LENDFT_CONTRACT_ABI } from '../constants/Contract';
 
-import { useWallet } from '../WalletProvider'
-
 const getContract = (wallet: any) => {
     if (!wallet) {
         return null;
