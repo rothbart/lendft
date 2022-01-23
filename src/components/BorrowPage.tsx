@@ -33,6 +33,9 @@ const BorrowPage = (props: any) => {
         return <div>Connect wallet</div>
     }
 
+    console.log(loanAmount);
+    console.log(nfts);
+
     const action = {
         name: "Create Loan",
         onClick: (nft: any) => { 

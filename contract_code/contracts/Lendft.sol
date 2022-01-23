@@ -1,6 +1,8 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
 contract Lendft {
     //Loan struct
     struct Loan {
@@ -9,27 +11,49 @@ contract Lendft {
         address lenderAddress;
         uint principal;
         uint interestRate;
-        address collateralNftContractAddress;
-        uint collateralNftId;
+        address nftContractAddress;
+        uint nftId;
         uint maturityInSeconds;
         uint startTime;
         bool active;
         bool settled;
     }
 
-    mapping (uint => Loan) loanById;
     Loan[] public loans;
+    mapping (address => mapping (address => mapping (uint => bool))) debtorHasActiveLoan;
+
+    modifier validateLoanTermInputs(uint principal, uint interestRate, uint maturityInSeconds) {
+        require(principal > 0, "Principal needs to be greater than zero");
+        require(interestRate > 0, "Interest rate needs to be greater than zero");
+        require(maturityInSeconds > 0, "Maturity needs to be greater than zero");
+        _;
+    }
+
+    modifier ensureDebtorDoesNotHaveActiveLoanForNft(address nftContractAddress, uint nftId) {
+        require(debtorHasActiveLoan[msg.sender][nftContractAddress][nftId] == false, "Already have active loan for this collateral");
+        _;
+    }
 
     function createPendingLoan(        
         uint principal,
         uint interestRate,
-        address collateralNftContractAddress,
-        uint collateralNftId,
+        address nftContractAddress,
+        uint nftId,
         uint maturityInSeconds
-    ) external returns(uint) {
+    ) 
+        external 
+        validateLoanTermInputs(principal, interestRate, maturityInSeconds)
+        ensureDebtorDoesNotHaveActiveLoanForNft(nftContractAddress, nftId)
+        returns(uint)
+    {
         // Create loan, use index in array as loanId
         // Add loan to loans array
         uint loanId = loans.length;
+
+        IERC721 tokenContract = IERC721(nftContractAddress);
+        require(tokenContract.ownerOf(nftId) == msg.sender, "You cannot transfer an NFT you don't own");
+
+        tokenContract.safeTransferFrom(msg.sender, address(this), nftId);
 
         Loan memory loan = Loan(
             loanId, 
@@ -37,8 +61,8 @@ contract Lendft {
             address(0), 
             principal, 
             interestRate, 
-            collateralNftContractAddress, 
-            collateralNftId,
+            nftContractAddress, 
+            nftId,
             maturityInSeconds,
             0,
             true,
@@ -46,6 +70,7 @@ contract Lendft {
         );
 
         loans.push(loan);
+        debtorHasActiveLoan[msg.sender][nftContractAddress][nftId] = true;
 
         return loanId;
     }
