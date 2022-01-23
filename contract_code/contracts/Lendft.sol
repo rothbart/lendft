@@ -51,8 +51,6 @@ contract Lendft {
         uint loanId = loans.length;
 
         IERC721 tokenContract = IERC721(nftContractAddress);
-        require(tokenContract.ownerOf(nftId) == msg.sender, "You cannot transfer an NFT you don't own");
-
         tokenContract.safeTransferFrom(msg.sender, address(this), nftId);
 
         Loan memory loan = Loan(
