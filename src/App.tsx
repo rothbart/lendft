@@ -30,7 +30,6 @@ enum NFTState {
 function App() {
   const wallet = useWallet();
   const [nfts, setNFTs] = useState<NFTList>([]);
-  const [walletState, setWalletState] = useState(NFTState.Loading);
 
   const params = qs.parse(window.location.search, { ignoreQueryPrefix: true });
   const addressOverride = params.address as string;
@@ -42,11 +41,8 @@ function App() {
           addressOverride || wallet.address,
           wallet.isRinkeby
         );
-        setNFTs(nfts);
-        setWalletState(NFTState.Loaded);
-      } else {
-        setWalletState(NFTState.NotFound);
-      }
+        setNFTs(nfts)
+      } 
     };
 
     getNFTList();
