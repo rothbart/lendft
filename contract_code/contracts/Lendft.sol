@@ -34,14 +34,38 @@ contract Lendft {
         _;
     }
 
-    function createPendingLoan(        
+    modifier isPendingLoan(uint loanId) {
+        require(loans[loanId].active == false, "This loan is already active");
+        require(loans[loanId].settled == false, "This loan has already been settled");
+        _;
+    }
+
+    modifier isOverdueLoan(uint loanId) {
+        require(loans[loanId].settled == false, "This loan has already been paid");
+        require(loans[loanId].active == true, "This loan is not active");
+        //  Need to confirm how start time is being collected, and do the correct time check
+        //  require(loans[loanId].startTime == loans[loanId].maturityInSeconds, "This loan is not overdue yet");
+        _;
+    }
+
+    modifier isValidLender(adddress callerAddress, uint loanId) {
+        require(loans[loanId].lenderAddress== callerAddress, "Caller is not the lender for this loan");
+        _;
+    }
+
+    modifier isValidDebtor(adddress callerAddress, uint loanId) {
+        require(loans[loanId].debtorAddress== callerAddress, "Caller is not the debtor for this loan");
+        _;
+    }
+
+    function createPendingLoan(
         uint principal,
         uint interestRate,
         address nftContractAddress,
         uint nftId,
         uint maturityInSeconds
-    ) 
-        external 
+    )
+        external
         validateLoanTermInputs(principal, interestRate, maturityInSeconds)
         ensureDebtorDoesNotHaveActiveLoanForNft(nftContractAddress, nftId)
         returns(uint)
@@ -54,12 +78,12 @@ contract Lendft {
         tokenContract.transferFrom(msg.sender, address(this), nftId);
 
         Loan memory loan = Loan(
-            loanId, 
+            loanId,
             msg.sender,
-            address(0), 
-            principal, 
-            interestRate, 
-            nftContractAddress, 
+            address(0),
+            principal,
+            interestRate,
+            nftContractAddress,
             nftId,
             maturityInSeconds,
             0,
@@ -85,12 +109,22 @@ contract Lendft {
         // Credit gets paid principal and interest
     }
 
-    function claimCollateral() external {
+    function claimCollateral(
+        uint loanId
+    )   external
+        isValidLender(msg.sender, loanId)
+        isOverdueLoan(loanId)
+    {
         // Lender claims collateral on overdue loan
+        address nftAddress = loans[loanId].nftContractAddress;
+        uint nftId = loans[loanId].nftId;
+        IERC721 tokenContract = IERC721(nftContractAddress);
+        tokenContract.transferFrom(address(this), msg.sender, nftId);
+        return nftId;
     }
 
     function initiateLoan(uint loanId) external {
-        // Lender accepts loan terms 
+        // Lender accepts loan terms
     }
 
     function selfDestruct() external {
