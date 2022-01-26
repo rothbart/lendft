@@ -33,9 +33,6 @@ const BorrowPage = (props: any) => {
         return <div>Connect wallet</div>
     }
 
-    console.log(loanAmount);
-    console.log(nfts);
-
     const action = {
         name: "Create Loan",
         onClick: (nft: any) => { 
@@ -59,6 +56,10 @@ const BorrowPage = (props: any) => {
         closeModal();
     }
 
+    const textFieldStyle = {
+        marginBottom: "16px",
+    }
+
     return (
         <React.Fragment>
             <NftListView nfts={nfts} action={action} />
@@ -69,17 +70,26 @@ const BorrowPage = (props: any) => {
                 <Box sx={style}>
                     {activeNft && <img src={activeNft.image_url} />}
                     <TextField
-                        label={"Loan Amount (USDC)"}
+                        fullWidth
+                        sx={textFieldStyle}
+                        type="number"
+                        label="Loan Amount (USDC)"
                         value={loanAmount}
                         onChange={e => setLoanAmount(parseInt(e.target.value))}
                     />
                     <TextField
-                        label={"Interest Rate"}
+                        fullWidth
+                        sx={textFieldStyle}
+                        type="number"
+                        label="Interest Rate"
                         value={interestRate}
                         onChange={e => setInterestRate(parseFloat(e.target.value))}
                     />
                     <TextField
-                        label={"Loan Duration (Seconds)"}
+                        fullWidth
+                        sx={textFieldStyle}
+                        type="number"
+                        label="Loan Duration (Seconds)"
                         value={loanDuration}
                         onChange={e => setLoanDuration(parseInt(e.target.value))}
                     />
