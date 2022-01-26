@@ -1,3 +1,13 @@
+# Modifying the contract
+
+In order to modify and test the contract, do the following:
+
+* Update the code in Lendft.sol
+* Deploy this code to Rinkeby via Remix
+* Update the `LENDFT_ADDRESS` and `LENDFT_ABI` in `src/constants/Contract.ts`
+* Add a new method in `src/utils/Contract.ts` that calls the method on your contract. 
+* Call the contract from the code, and it should Just Work™️
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
