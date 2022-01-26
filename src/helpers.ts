@@ -30,9 +30,6 @@ export async function getNFTs(owner: string, testNetwork: boolean) {
 
   const tokenData: Asset[] = res.data?.assets || [];
 
-  console.log("tokendata");
-  console.log(tokenData);
-
   return tokenData.map((tokenData) => ({
     name: tokenData.name,
     id: parseInt(tokenData.token_id),
