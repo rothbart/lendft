@@ -4,6 +4,13 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract Lendft {
+    enum LoanState {
+        Pending,
+        Active,
+        Settled,
+        Cancelled
+    }
+
     //Loan struct
     struct Loan {
         uint loanId;
@@ -15,8 +22,7 @@ contract Lendft {
         uint nftId;
         uint maturityInSeconds;
         uint startTime;
-        bool active;
-        bool settled;
+        LoanState status;
     }
 
     Loan[] public loans;
@@ -29,31 +35,29 @@ contract Lendft {
         _;
     }
 
-    modifier ensureDebtorDoesNotHaveActiveLoanForNft(address nftContractAddress, uint nftId) {
+    modifier onlyUnloaned(address nftContractAddress, uint nftId) {
         require(debtorHasActiveLoan[msg.sender][nftContractAddress][nftId] == false, "Already have active loan for this collateral");
         _;
     }
 
     modifier isPendingLoan(uint loanId) {
-        require(loans[loanId].active == false, "This loan is already active");
-        require(loans[loanId].settled == false, "This loan has already been settled");
+        require(loans[loanId].status == LoanState.Pending, "This loan is not available");
         _;
     }
 
     modifier isOverdueLoan(uint loanId) {
-        require(loans[loanId].settled == false, "This loan has already been paid");
-        require(loans[loanId].active == true, "This loan is not active");
+        require(loans[loanId].status == LoanState.Active, "This loan has already been paid");
         //  Need to confirm how start time is being collected, and do the correct time check
         //  require(loans[loanId].startTime == loans[loanId].maturityInSeconds, "This loan is not overdue yet");
         _;
     }
 
-    modifier isValidLender(adddress callerAddress, uint loanId) {
+    modifier onlyLender(address callerAddress, uint loanId) {
         require(loans[loanId].lenderAddress== callerAddress, "Caller is not the lender for this loan");
         _;
     }
 
-    modifier isValidDebtor(adddress callerAddress, uint loanId) {
+    modifier isValidDebtor(address callerAddress, uint loanId) {
         require(loans[loanId].debtorAddress== callerAddress, "Caller is not the debtor for this loan");
         _;
     }
@@ -67,7 +71,7 @@ contract Lendft {
     )
         external
         validateLoanTermInputs(principal, interestRate, maturityInSeconds)
-        ensureDebtorDoesNotHaveActiveLoanForNft(nftContractAddress, nftId)
+        onlyUnloaned(nftContractAddress, nftId)
         returns(uint)
     {
         // Create loan, use index in array as loanId
@@ -87,8 +91,7 @@ contract Lendft {
             nftId,
             maturityInSeconds,
             0,
-            true,
-            false
+            LoanState.Pending
         );
 
         loans.push(loan);
@@ -112,11 +115,12 @@ contract Lendft {
     function claimCollateral(
         uint loanId
     )   external
-        isValidLender(msg.sender, loanId)
+        onlyLender(msg.sender, loanId)
         isOverdueLoan(loanId)
+        returns(uint)
     {
         // Lender claims collateral on overdue loan
-        address nftAddress = loans[loanId].nftContractAddress;
+        address nftContractAddress = loans[loanId].nftContractAddress;
         uint nftId = loans[loanId].nftId;
         IERC721 tokenContract = IERC721(nftContractAddress);
         tokenContract.transferFrom(address(this), msg.sender, nftId);
