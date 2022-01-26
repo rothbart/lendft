@@ -21,12 +21,6 @@ import BorrowPage from "./components/BorrowPage";
 
 import "./App.css";
 
-enum NFTState {
-  Loading,
-  Loaded,
-  NotFound,
-}
-
 function App() {
   const wallet = useWallet();
   const [nfts, setNFTs] = useState<NFTList>([]);

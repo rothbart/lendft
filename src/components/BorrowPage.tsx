@@ -7,7 +7,7 @@ import { createPendingLoan } from "../utils/Contract";
 
 import NftListView from "./shared/NftListView";
 
-const style = {
+const boxStyle = {
     position: 'absolute',
     top: '50%',
     left: '50%',
@@ -18,6 +18,10 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
+
+const textFieldStyle = {
+    marginBottom: "16px",
+}
 
 const BorrowPage = (props: any) => {
     const [modalOpen, setModalOpen] = useState<any>(false);
@@ -56,10 +60,6 @@ const BorrowPage = (props: any) => {
         closeModal();
     }
 
-    const textFieldStyle = {
-        marginBottom: "16px",
-    }
-
     return (
         <React.Fragment>
             <NftListView nfts={nfts} action={action} />
@@ -67,7 +67,7 @@ const BorrowPage = (props: any) => {
                 open={modalOpen}
                 onClose={closeModal}
             >
-                <Box sx={style}>
+                <Box sx={boxStyle}>
                     {activeNft && <img src={activeNft.image_url} />}
                     <TextField
                         fullWidth
