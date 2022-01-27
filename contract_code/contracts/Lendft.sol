@@ -25,6 +25,8 @@ contract Lendft {
         LoanState status;
     }
 
+    event LoanCancelled(uint loanId, address debtor);
+
     Loan[] public loans;
     mapping (address => mapping (address => mapping (uint => bool))) debtorHasActiveLoan;
 
@@ -99,9 +101,19 @@ contract Lendft {
 
         return loanId;
     }
-
-    function cancelLoan(uint loanId) external {
-        // Debtor cancels a pending loan
+    
+    // Debtor cancels a pending loan, returns true if successful
+    function cancelLoan(uint loanId) 
+        external 
+        isValidDebtor(msg.sender, loanId) 
+        isPendingLoan(loanId)
+        returns(bool)
+    {
+        LoanState state = loans[loanId].status;
+        require(state == LoanState.Pending, "Must cancel a pending loan");
+        loans[loanId].status = LoanState.Cancelled;
+        emit LoanCancelled(loanId, msg.sender);
+        return true;
     }
 
     function repayLoan(uint loanId) external {
