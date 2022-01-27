@@ -57,7 +57,7 @@ contract Lendft {
     modifier isOverdueLoan(uint loanId) {
         require(loans[loanId].status == LoanState.Active, "This loan has already been paid");
         //  Need to confirm how start time is being collected, and do the correct time check
-        //  require(loans[loanId].startTime == loans[loanId].maturityInSeconds, "This loan is not overdue yet");
+        require(now - loans[loanId].startTime > loans[loanId].maturityInSeconds, "This loan is not overdue yet");
         _;
     }
 
