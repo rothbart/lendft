@@ -26,6 +26,8 @@ contract Lendft {
     }
 
     event LoanCancelled(uint loanId, address debtor);
+    event LoanInitiated(uint loanId, address lender);
+    event LoanRepaid(uint loanId);
 
     Loan[] public loans;
     mapping (address => mapping (address => mapping (uint => bool))) debtorHasActiveLoan;
@@ -44,6 +46,11 @@ contract Lendft {
 
     modifier isPendingLoan(uint loanId) {
         require(loans[loanId].status == LoanState.Pending, "This loan is not available");
+        _;
+    }
+
+    modifier isActiveLoan(uint loanId) {
+        require(loans[loanId].status == LoanState.Active, "This loan is not active");
         _;
     }
 
@@ -111,17 +118,38 @@ contract Lendft {
     {
         LoanState state = loans[loanId].status;
         require(state == LoanState.Pending, "Must cancel a pending loan");
+        
+        //Change loan state
         loans[loanId].status = LoanState.Cancelled;
+
+        // Return the NFT to the debtor
+        IERC721 tokenContract = IERC721(loans[loanId].nftContractAddress);
+        tokenContract.transferFrom(address(this), loans[loanId].debtor, loans[loanId].nftId);
+
         emit LoanCancelled(loanId, msg.sender);
+
         return true;
     }
 
-    function repayLoan(uint loanId) external {
-        // Validate debtor is the one calling this function
+    function repayLoan(uint loanId) external payable isActiveLoan(loanId) returns(bool){
+        // I think we can allow anyone to repay a loan
+        
         // Validate debtor has enough capital
-        // Validate loan is not already resolved
+        uint yearsElapsed = (now - loans[loanId].startTime) / 1 years;
+        uint loanBalance = loans[loanId].principal + loans[loanId].interestRate * yearsElapsed;
+        require(loanBalance <= msg.value, "insufficient funds to repay loan");
+        
         // Debtor gets back NFT
+        IERC721 tokenContract = IERC721(loans[loanId].nftContractAddress);
+        tokenContract.transferFrom(address(this), loans[loanId].debtor, loans[loanId].nftId);
+        
         // Credit gets paid principal and interest
+        (bool sent, bytes memory data) = loans[loanId].lenderAddress.call{value: loanBalance}("");
+
+        emit LoanRepaid(loanId);
+
+        return sent;
+        
     }
 
     function claimCollateral(
@@ -139,8 +167,26 @@ contract Lendft {
         return nftId;
     }
 
-    function initiateLoan(uint loanId) external {
-        // Lender accepts loan terms
+    // Lender accepts loan terms
+    function initiateLoan(uint loanId) external payable isPendingLoan(loanId) returns(bool) {
+    
+        // Check that lender has appropriate balance
+        require( msg.value >= loans[loanId].principal, "insufficient funds recieved" );
+
+        // Transfer ETH tokens to borrower
+        
+        (bool sent, bytes memory data) = loans[loanId].debtorAddress.call{value: principal}("");
+
+        // change status to active
+        loans[loanId].status = LoanState.Active;
+
+        //start the clock
+        loans[loanId].startTime = now;
+
+        emit LoanInitiated(loanId, msg.sender);
+
+        return sent;
+
     }
 
     function selfDestruct() external {
