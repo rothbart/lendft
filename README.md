@@ -1,6 +1,6 @@
 # Modifying the contract
 
-In order to modify and test the contract, do the following:
+In order to modify and test the contracts, do the following:
 
 * Update the code in Lendft.sol
 * Deploy this code to Rinkeby via Remix
