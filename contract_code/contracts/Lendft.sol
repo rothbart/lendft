@@ -56,7 +56,7 @@ contract Lendft {
 
     modifier isOverdueLoan(uint loanId) {
         require(loans[loanId].status == LoanState.Active, "This loan is not active");
-        require(now - loans[loanId].startTime > loans[loanId].maturityInSeconds, "This loan is not overdue yet");
+        require(block.timestamp - loans[loanId].startTime > loans[loanId].maturityInSeconds, "This loan is not overdue yet");
         _;
     }
 
@@ -120,11 +120,11 @@ contract Lendft {
         
         //Change loan state
         loans[loanId].status = LoanState.Cancelled;
-        debtorHasActiveLoan[msg.sender][loans[loanId].nftContractAddress][nftId] = false;
+        debtorHasActiveLoan[msg.sender][loans[loanId].nftContractAddress][loans[loanId].nftId] = false;
 
         // Return the NFT to the debtor
         IERC721 tokenContract = IERC721(loans[loanId].nftContractAddress);
-        tokenContract.transferFrom(address(this), loans[loanId].debtor, loans[loanId].nftId);
+        tokenContract.transferFrom(address(this), loans[loanId].debtorAddress, loans[loanId].nftId);
 
         emit LoanCancelled(loanId, msg.sender);
 
@@ -135,7 +135,7 @@ contract Lendft {
         // I think we can allow anyone to repay a loan
         
         // Validate debtor has enough capital
-        uint yearsElapsed = (now - loans[loanId].startTime) / 1 years;
+        uint yearsElapsed = (block.timestamp - loans[loanId].startTime) / 365 days;
         uint loanBalance = loans[loanId].principal + loans[loanId].interestRate * yearsElapsed;
         require(loanBalance <= msg.value, "insufficient funds to repay loan");
         
@@ -145,8 +145,10 @@ contract Lendft {
         // Debtor gets back NFT
         if (sent) {
             IERC721 tokenContract = IERC721(loans[loanId].nftContractAddress);
-            tokenContract.transferFrom(address(this), loans[loanId].debtor, loans[loanId].nftId);
+            tokenContract.transferFrom(address(this), loans[loanId].debtorAddress, loans[loanId].nftId);
         }
+        
+        debtorHasActiveLoan[loans[loanId].debtorAddress][loans[loanId].nftContractAddress][loans[loanId].nftId] = false;
 
         emit LoanRepaid(loanId);
 
@@ -176,13 +178,13 @@ contract Lendft {
 
         // Transfer ETH tokens to borrower
         
-        (bool sent, bytes memory data) = loans[loanId].debtorAddress.call{value: principal}("");
+        (bool sent, ) = loans[loanId].debtorAddress.call{value: loans[loanId].principal}("");
 
         // change status to active
         loans[loanId].status = LoanState.Active;
 
         //start the clock
-        loans[loanId].startTime = now;
+        loans[loanId].startTime = block.timestamp;
 
         emit LoanInitiated(loanId, msg.sender);
 

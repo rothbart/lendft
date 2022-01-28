@@ -2,11 +2,11 @@ const hre = require("hardhat");
 
 async function main() {
   const LendFt = await hre.ethers.getContractFactory("Lendft");
-  const lendft = await Lendft.deploy("Hello, Hardhat!");
+  const lendft = await LendFt.deploy();
 
   await lendft.deployed();
 
-  console.log("Lendft deployed to:", greeter.address);
+  console.log("Lendft deployed to:", lendft.address);
 }
 
 main()
