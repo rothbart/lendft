@@ -55,8 +55,7 @@ contract Lendft {
     }
 
     modifier isOverdueLoan(uint loanId) {
-        require(loans[loanId].status == LoanState.Active, "This loan has already been paid");
-        //  Need to confirm how start time is being collected, and do the correct time check
+        require(loans[loanId].status == LoanState.Active, "This loan is not active");
         require(now - loans[loanId].startTime > loans[loanId].maturityInSeconds, "This loan is not overdue yet");
         _;
     }
@@ -121,6 +120,7 @@ contract Lendft {
         
         //Change loan state
         loans[loanId].status = LoanState.Cancelled;
+        debtorHasActiveLoan[msg.sender][loans[loanId].nftContractAddress][nftId] = false;
 
         // Return the NFT to the debtor
         IERC721 tokenContract = IERC721(loans[loanId].nftContractAddress);
@@ -139,17 +139,18 @@ contract Lendft {
         uint loanBalance = loans[loanId].principal + loans[loanId].interestRate * yearsElapsed;
         require(loanBalance <= msg.value, "insufficient funds to repay loan");
         
-        // Debtor gets back NFT
-        IERC721 tokenContract = IERC721(loans[loanId].nftContractAddress);
-        tokenContract.transferFrom(address(this), loans[loanId].debtor, loans[loanId].nftId);
-        
         // Credit gets paid principal and interest
-        (bool sent, bytes memory data) = loans[loanId].lenderAddress.call{value: loanBalance}("");
+        (bool sent, ) = loans[loanId].lenderAddress.call{value: loanBalance}("");
+        
+        // Debtor gets back NFT
+        if (sent) {
+            IERC721 tokenContract = IERC721(loans[loanId].nftContractAddress);
+            tokenContract.transferFrom(address(this), loans[loanId].debtor, loans[loanId].nftId);
+        }
 
         emit LoanRepaid(loanId);
 
         return sent;
-        
     }
 
     function claimCollateral(
