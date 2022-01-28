@@ -25,6 +25,10 @@ contract Lendft {
         LoanState status;
     }
 
+    event LoanCancelled(uint loanId, address debtor);
+    event LoanInitiated(uint loanId, address lender);
+    event LoanRepaid(uint loanId);
+
     Loan[] public loans;
     mapping (address => mapping (address => mapping (uint => bool))) debtorHasActiveLoan;
 
@@ -45,10 +49,14 @@ contract Lendft {
         _;
     }
 
+    modifier isActiveLoan(uint loanId) {
+        require(loans[loanId].status == LoanState.Active, "This loan is not active");
+        _;
+    }
+
     modifier isOverdueLoan(uint loanId) {
-        require(loans[loanId].status == LoanState.Active, "This loan has already been paid");
-        //  Need to confirm how start time is being collected, and do the correct time check
-        //  require(loans[loanId].startTime == loans[loanId].maturityInSeconds, "This loan is not overdue yet");
+        require(loans[loanId].status == LoanState.Active, "This loan is not active");
+        require(block.timestamp - loans[loanId].startTime > loans[loanId].maturityInSeconds, "This loan is not overdue yet");
         _;
     }
 
@@ -99,17 +107,52 @@ contract Lendft {
 
         return loanId;
     }
+    
+    // Debtor cancels a pending loan, returns true if successful
+    function cancelLoan(uint loanId) 
+        external 
+        isValidDebtor(msg.sender, loanId) 
+        isPendingLoan(loanId)
+        returns(bool)
+    {
+        LoanState state = loans[loanId].status;
+        require(state == LoanState.Pending, "Must cancel a pending loan");
+        
+        //Change loan state
+        loans[loanId].status = LoanState.Cancelled;
+        debtorHasActiveLoan[msg.sender][loans[loanId].nftContractAddress][loans[loanId].nftId] = false;
 
-    function cancelLoan(uint loanId) external {
-        // Debtor cancels a pending loan
+        // Return the NFT to the debtor
+        IERC721 tokenContract = IERC721(loans[loanId].nftContractAddress);
+        tokenContract.transferFrom(address(this), loans[loanId].debtorAddress, loans[loanId].nftId);
+
+        emit LoanCancelled(loanId, msg.sender);
+
+        return true;
     }
 
-    function repayLoan(uint loanId) external {
-        // Validate debtor is the one calling this function
+    function repayLoan(uint loanId) external payable isActiveLoan(loanId) returns(bool){
+        // I think we can allow anyone to repay a loan
+        
         // Validate debtor has enough capital
-        // Validate loan is not already resolved
-        // Debtor gets back NFT
+        uint yearsElapsed = (block.timestamp - loans[loanId].startTime) / 365 days;
+        uint loanBalance = loans[loanId].principal + loans[loanId].interestRate * yearsElapsed;
+        require(loanBalance <= msg.value, "insufficient funds to repay loan");
+        
         // Credit gets paid principal and interest
+        (bool sent, ) = loans[loanId].lenderAddress.call{value: loanBalance}("");
+        
+        // Debtor gets back NFT
+        if (sent) {
+            IERC721 tokenContract = IERC721(loans[loanId].nftContractAddress);
+            tokenContract.transferFrom(address(this), loans[loanId].debtorAddress, loans[loanId].nftId);
+        }
+        
+        debtorHasActiveLoan[loans[loanId].debtorAddress][loans[loanId].nftContractAddress][loans[loanId].nftId] = false;
+
+        emit LoanRepaid(loanId);
+
+        return sent;
     }
 
     function claimCollateral(
@@ -127,8 +170,26 @@ contract Lendft {
         return nftId;
     }
 
-    function initiateLoan(uint loanId) external {
-        // Lender accepts loan terms
+    // Lender accepts loan terms
+    function initiateLoan(uint loanId) external payable isPendingLoan(loanId) returns(bool) {
+    
+        // Check that lender has appropriate balance
+        require( msg.value >= loans[loanId].principal, "insufficient funds recieved" );
+
+        // Transfer ETH tokens to borrower
+        
+        (bool sent, ) = loans[loanId].debtorAddress.call{value: loans[loanId].principal}("");
+
+        // change status to active
+        loans[loanId].status = LoanState.Active;
+
+        //start the clock
+        loans[loanId].startTime = block.timestamp;
+
+        emit LoanInitiated(loanId, msg.sender);
+
+        return sent;
+
     }
 
     function selfDestruct() external {
