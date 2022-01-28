@@ -10,7 +10,7 @@ import { getNftInfo } from "../helpers";
 import NftListView from "./shared/NftListView";
 import { modalStyle } from "./shared/styles";
 
-const ManagePage = (props: any) => {
+const ManagePage = () => {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [activeLoan, setActiveLoan] = useState<any>(null);
     const [debtorLoans, setDebtorLoans] = useState<any>([]);
