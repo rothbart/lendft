@@ -40,3 +40,14 @@ export async function getNFTs(owner: string, testNetwork: boolean) {
   }));
 }
 export type NFTList = Awaited<ReturnType<typeof getNFTs>>;
+
+export const getNftInfo = async (nftContractAddress: any, nftId: any) => {
+  const config: AxiosRequestConfig = {
+    method: "get",
+    url: `https://testnets-api.opensea.io/api/v1/asset/${nftContractAddress}/${nftId}`
+  };
+
+  const res = await axios(config);
+
+  return res;
+}

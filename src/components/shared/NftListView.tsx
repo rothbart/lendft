@@ -3,7 +3,7 @@ import React from "react";
 import Button from '@mui/material/Button';
 
 const NftListView = (props: any) => {
-    const { nfts, action } = props;
+    const { nfts, action, additionalTableFields } = props;
 
     if (!nfts.length) {
         return <p>No NFTs found</p>;
@@ -22,9 +22,14 @@ const NftListView = (props: any) => {
                 <th scope="col" className="columnheader">
                     ID
                 </th>
-                <th scope="col" className="columnheader">
-                    Contract
-                </th>
+                { additionalTableFields.map((tableField: any) => {
+                        return (
+                            <th key={tableField.name} scope="col" className="columnheader">
+                                {tableField.name}
+                            </th>
+                        )
+                    })
+                }     
                 { action && 
                     <th scope="col" className="columnheader">
                         {" "}
@@ -45,7 +50,7 @@ const NftListView = (props: any) => {
                             </a>
                         </th>
                         <td className="cell">{nft.id}</td>
-                        <td className="cell">{nft.contract_address}</td>
+                        { additionalTableFields.map((tableField: any) => <td key={tableField.attribute} className="cell">{nft[tableField.attribute]}</td>) }
                         { action && <Button onClick={() => { action.onClick(nft) }}>{action.name}</Button>}
                         </tr>
                     );

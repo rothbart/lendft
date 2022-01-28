@@ -13,11 +13,17 @@ import Button from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 
-import { SITE_PAGES_INFO, PAGE_ROUTE_BORROW, PAGE_ROUTE_LEND } from "./constants/Routing";
+import { 
+  SITE_PAGES_INFO, 
+  PAGE_ROUTE_BORROW, 
+  PAGE_ROUTE_LEND, 
+  PAGE_ROUTE_MANAGE,
+} from "./constants/Routing";
 import { getNFTs, NFTList } from "./helpers";
 import { useWallet } from "./WalletProvider";
 
 import BorrowPage from "./components/BorrowPage";
+import ManagePage from "./components/ManagePage";
 
 import "./App.css";
 
@@ -72,6 +78,7 @@ function App() {
             <Route index element={<div>Welcome to LendFT</div>} />
             <Route path={PAGE_ROUTE_BORROW} element={<BorrowPage nfts={nfts} />} />
             <Route path={PAGE_ROUTE_LEND} element={<div>Lend</div>} />
+            <Route path={PAGE_ROUTE_MANAGE} element={<ManagePage />} />
           </Route>
         </Routes>
       </Router>
