@@ -57,7 +57,7 @@ const ManagePage = () => {
             id: parseInt(debtorLoan.nftId._hex, 16),
             contract_address: debtorLoan.nftContractAddress,
             status: LoanStatus[debtorLoan.status],
-            image_url: nft.image_thumbnail_url,
+            image_url: nft.image_url,
             permalink: nft.permalink,
             principal: parseInt(debtorLoan.principal._hex, 16),
             loanId: parseInt(debtorLoan.loanId._hex, 16),
