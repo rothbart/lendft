@@ -46,7 +46,7 @@ const BorrowPage = (props: any) => {
 
         await createPendingLoan(
             wallet, 
-            loanAmount * 10 ** 9, // convert to wei
+            loanAmount * 10 ** 18, // convert to wei
             interestRate * 100, // convert to bps
             activeNft.contract_address, 
             activeNft.id, 
