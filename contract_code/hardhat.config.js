@@ -34,6 +34,12 @@ const RINKEBY_PRIVATE_KEY = "2d5a30a484b43bb305e2f92507c0cf81479e959125058d964c2
 
 module.exports = {
   solidity: "0.8.0",
+  overrides: {
+    "contracts/Lendft.sol": {
+      version: "0.8.0",
+      settings: { }
+    }
+  },
   networks: {
     rinkeby: {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,

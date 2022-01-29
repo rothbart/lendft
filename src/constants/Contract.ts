@@ -1,4 +1,4 @@
-export const LENDFT_ADDRESS = "0x57A356F6d5a9fbF4F1C503076A41F965Aa612c73";
+export const LENDFT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 export const USDC_ADDRESS = "0xeb8f08a975ab53e34d8a0330e0d34de942c95926";
 
 export const LoanStatus = ['PENDING'];
@@ -154,6 +154,71 @@ export const LENDFT_ABI = [
     {
         "inputs": [],
         "name": "getDebtorLoans",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "loanId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "debtorAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lenderAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "principal",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "interestRate",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "nftContractAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "nftId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maturityInSeconds",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "startTime",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "enum Lendft.LoanState",
+                        "name": "status",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct Lendft.Loan[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getAllLoans",
         "outputs": [
             {
                 "components": [

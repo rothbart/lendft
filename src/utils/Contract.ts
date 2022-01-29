@@ -60,6 +60,26 @@ export const getDebtorLoans = async (wallet: any) => {
     }
 }
 
+export const getPendingLoans = async (wallet: any) => {
+    const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
+    console.log('here');
+    if (!wallet || !lendftContract) {
+        return null;
+    }
+
+    try {
+        const loans = await lendftContract.getAllLoans();
+        const pendingLoans = [];
+        for (const loan in loans){
+            console.log(loan);
+        }
+            
+        return loans;
+    } catch (err) {
+        console.log("lendft getDebtorLoans transaction failed", err)
+    }
+}
+
 export const cancelLoan = async (wallet: any, loanId: number) => {
     const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
 
