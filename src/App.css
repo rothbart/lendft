@@ -18,5 +18,5 @@
 }
 
 tr:nth-child(even) {
-  background-color: #f8f8f8f1;
+  background-color: hsl(210deg 79% 95%);
 }
