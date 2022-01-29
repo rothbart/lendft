@@ -1,4 +1,4 @@
-export const LENDFT_ADDRESS = "0x57A356F6d5a9fbF4F1C503076A41F965Aa612c73";
+export const LENDFT_ADDRESS = "0x4E3962581a431cd5169F782BcdAD452C51823e80";
 export const USDC_ADDRESS = "0xeb8f08a975ab53e34d8a0330e0d34de942c95926";
 
 export const LoanStatus = ['PENDING'];
@@ -153,64 +153,12 @@ export const LENDFT_ABI = [
     },
     {
         "inputs": [],
-        "name": "getDebtorLoans",
+        "name": "getDebtorLoanIds",
         "outputs": [
             {
-                "components": [
-                    {
-                        "internalType": "uint256",
-                        "name": "loanId",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "debtorAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "lenderAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "principal",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "interestRate",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "nftContractAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "nftId",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "maturityInSeconds",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "startTime",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "enum Lendft.LoanState",
-                        "name": "status",
-                        "type": "uint8"
-                    }
-                ],
-                "internalType": "struct Lendft.Loan[]",
+                "internalType": "uint256[]",
                 "name": "",
-                "type": "tuple[]"
+                "type": "uint256[]"
             }
         ],
         "stateMutability": "view",
@@ -238,62 +186,22 @@ export const LENDFT_ABI = [
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
             }
         ],
-        "name": "loans",
+        "name": "loanIdsByDebtor",
         "outputs": [
             {
                 "internalType": "uint256",
-                "name": "loanId",
+                "name": "",
                 "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "debtorAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "lenderAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "principal",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "interestRate",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "nftContractAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "nftId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "maturityInSeconds",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "startTime",
-                "type": "uint256"
-            },
-            {
-                "internalType": "enum Lendft.LoanState",
-                "name": "status",
-                "type": "uint8"
             }
         ],
         "stateMutability": "view",
@@ -302,17 +210,12 @@ export const LENDFT_ABI = [
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
             }
         ],
-        "name": "loansByDebtor",
+        "name": "loans",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -394,6 +297,6 @@ export const LENDFT_ABI = [
         "stateMutability": "nonpayable",
         "type": "function"
     }
-];
+]
 
 export const ERC721_ABI = [{"constant":false,"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"mint","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"_data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"}];

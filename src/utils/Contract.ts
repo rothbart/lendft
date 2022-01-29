@@ -44,7 +44,7 @@ export const createPendingLoan = async (wallet: any, principal: number, interest
     }
 }
 
-export const getDebtorLoans = async (wallet: any) => {
+export const getDebtorLoanIds = async (wallet: any) => {
     const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
 
     if (!wallet || !lendftContract) {
@@ -52,11 +52,11 @@ export const getDebtorLoans = async (wallet: any) => {
     }
 
     try {
-        const loans = await lendftContract.getDebtorLoans();
+        const loanIds = await lendftContract.getDebtorLoanIds();
 
-        return loans;
+        return loanIds;
     } catch (err) {
-        console.log("lendft getDebtorLoans transaction failed", err)
+        console.log("lendft getDebtorLoanIds transaction failed", err)
     }
 }
 
@@ -70,6 +70,21 @@ export const cancelLoan = async (wallet: any, loanId: number) => {
     try {
         const transaction = await lendftContract.cancelLoan(loanId);
         await transaction.wait();
+    } catch (err) {
+        console.log("lendft cancelLoan transaction failed", err)
+    }
+}
+
+export const getLoan = async (wallet: any, loanId: number) => {
+    const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
+
+    if (!wallet || !lendftContract) {
+        return null;
+    }
+
+    try {
+        const loan = await lendftContract.getLoans(loanId);
+        return loan
     } catch (err) {
         console.log("lendft cancelLoan transaction failed", err)
     }
