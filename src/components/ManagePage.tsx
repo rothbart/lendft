@@ -25,6 +25,10 @@ const ManagePage = () => {
     useEffect(() => {
         const getData = async () => {
             // TODO: Add lender loans here
+
+            // Fetch loans and NFTs on the contract so we don't
+            // hit opensea api for every loan. we will hydrate the loan
+            // information below with the data on the NFT
             const loans = await getDebtorLoans(wallet);
             const nftsOnContract = await getNFTs(LENDFT_ADDRESS, wallet.isRinkeby);
 
@@ -84,7 +88,7 @@ const ManagePage = () => {
         {
             name: 'Amount',
             attribute: 'principal',
-            displayFn: (value: any) => `${value/(10 ** 18)}%`
+            displayFn: (value: any) => `${value/(10 ** 18)}`
         },
         {
             name: 'Interest rate',
