@@ -25,12 +25,14 @@ contract Lendft {
         LoanState status;
     }
 
+    event LoanCreated(uint loanId, address debtor);
     event LoanCancelled(uint loanId, address debtor);
     event LoanInitiated(uint loanId, address lender);
     event LoanRepaid(uint loanId);
 
     Loan[] public loans;
     mapping (address => mapping (address => mapping (uint => bool))) debtorHasActiveLoan;
+    mapping (address => Loan[]) public loansByDebtor;
 
     modifier validateLoanTermInputs(uint principal, uint interestRate, uint maturityInSeconds) {
         require(principal > 0, "Principal needs to be greater than zero");
@@ -104,6 +106,10 @@ contract Lendft {
 
         loans.push(loan);
         debtorHasActiveLoan[msg.sender][nftContractAddress][nftId] = true;
+
+        loansByDebtor[msg.sender].push(loan);
+
+        emit LoanCreated(loanId, msg.sender);
 
         return loanId;
     }
@@ -190,6 +196,10 @@ contract Lendft {
 
         return sent;
 
+    }
+
+    function getDebtorLoans() external view returns(Loan[] memory) {
+        return loansByDebtor[msg.sender];
     }
 
     function selfDestruct() external {

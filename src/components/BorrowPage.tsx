@@ -6,18 +6,7 @@ import { useWallet } from "../WalletProvider";
 import { createPendingLoan } from "../utils/Contract";
 
 import NftListView from "./shared/NftListView";
-
-const boxStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
+import { modalStyle } from "./shared/styles";
 
 const textFieldStyle = {
     marginBottom: "16px",
@@ -60,14 +49,21 @@ const BorrowPage = (props: any) => {
         closeModal();
     }
 
+    const additionalTableFields = [
+        {
+            name: 'Contract',
+            attribute: 'contract_address',
+        }
+    ]
+
     return (
         <React.Fragment>
-            <NftListView nfts={nfts} action={action} />
+            <NftListView nfts={nfts} action={action} additionalTableFields={additionalTableFields} />
             <Modal
                 open={modalOpen}
                 onClose={closeModal}
             >
-                <Box sx={boxStyle}>
+                <Box sx={modalStyle}>
                     {activeNft && <img src={activeNft.image_url} />}
                     <TextField
                         fullWidth

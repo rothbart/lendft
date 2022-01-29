@@ -12,7 +12,7 @@ const getContract = (wallet: any, address: string, abi: any) => {
     return contract;
 }
 
-const createPendingLoan = async (wallet: any, principal: number, interestRate: number, nftContractAddress: string, nftId: string, maturityInSeconds: number) => {
+export const createPendingLoan = async (wallet: any, principal: number, interestRate: number, nftContractAddress: string, nftId: string, maturityInSeconds: number) => {
     const erc721Contract = getContract(wallet, nftContractAddress, ERC721_ABI);
     const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
 
@@ -40,8 +40,37 @@ const createPendingLoan = async (wallet: any, principal: number, interestRate: n
 
         return returnValue;
     } catch (err) {
-        console.log("lendft transaction failed", err);
+        console.log("lendft createPendingLoan transaction failed", err);
     }
 }
 
-export { createPendingLoan }
+export const getDebtorLoans = async (wallet: any) => {
+    const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
+
+    if (!wallet || !lendftContract) {
+        return null;
+    }
+
+    try {
+        const loans = await lendftContract.getDebtorLoans();
+
+        return loans;
+    } catch (err) {
+        console.log("lendft getDebtorLoans transaction failed", err)
+    }
+}
+
+export const cancelLoan = async (wallet: any, loanId: number) => {
+    const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
+
+    if (!wallet || !lendftContract) {
+        return null;
+    }
+
+    try {
+        const transaction = await lendftContract.cancelLoan(loanId);
+        await transaction.wait();
+    } catch (err) {
+        console.log("lendft cancelLoan transaction failed", err)
+    }
+}
