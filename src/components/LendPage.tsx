@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal from "@mui/material/Modal";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 import { useWallet } from "../WalletProvider";
 import { getLoans, initiateLoan} from "../utils/Contract";
@@ -120,7 +120,7 @@ const callInitiateLoan = async () => {
 
   return (
     <React.Fragment>
-        <NftListView nfts={pendingLoans} action={action} additionalTableFields={additionalTableFields} />
+        <NftListView nfts={hydratedPendingLoans} action={action} additionalTableFields={additionalTableFields} />
         <Modal
             open={modalOpen}
             onClose={closeModal}
