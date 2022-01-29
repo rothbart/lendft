@@ -32,9 +32,10 @@ const ManagePage = () => {
             const loanIds = await getDebtorLoanIds(wallet);
             const nftsOnContract = await getNFTs(LENDFT_ADDRESS, wallet.isRinkeby);
 
-            const debtorLoans = loanIds.map(async (loan: any) => {
-                return await getLoan(wallet, parseInt(loan.loanId._hex, 16))
-            })
+            const debtorLoans = await Promise.all(loanIds.map(async (loanId: any) => {
+                const loan = await getLoan(wallet, parseInt(loanId._hex, 16));
+                return loan;
+            }))
 
             setDebtorLoans(debtorLoans);
             setContractNfts(nftsOnContract);

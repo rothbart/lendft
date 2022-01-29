@@ -83,7 +83,7 @@ export const getLoan = async (wallet: any, loanId: number) => {
     }
 
     try {
-        const loan = await lendftContract.getLoans(loanId);
+        const loan = await lendftContract.loans(loanId);
         return loan
     } catch (err) {
         console.log("lendft cancelLoan transaction failed", err)
