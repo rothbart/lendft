@@ -1,12 +1,22 @@
 .table {
   margin: auto;
+  border-spacing: 0px;
 }
 
 .columnheader {
   text-decoration: underline;
-  padding-bottom: 16px;
+  padding: 16px;
 }
 
 .cell {
   padding: 8px;
+  text-align: center;
+}
+
+.tableheader {
+  background-color: hsl(210deg 79% 90%);
+}
+
+tr:nth-child(even) {
+  background-color: #f8f8f8f1;
 }

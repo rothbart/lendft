@@ -165,24 +165,63 @@ const ManagePage = () => {
 
   return (
     <React.Fragment>
-      <Typography variant="h5">Pending Loans</Typography>
-      <NftListView
-        nfts={pendingLoans}
-        action={pendingLoanAction}
-        additionalTableFields={additionalTableFields}
-      />
-      <Typography variant="h5">Borrowing Activity</Typography>
-      <NftListView
-        nfts={borrowingActivity}
-        action={borrowingActivityAction}
-        additionalTableFields={additionalTableFields}
-      />
-      <Typography variant="h5">Lending Activity</Typography>
-      <NftListView
-        nfts={lendingActivity}
-        action={lendingActivityAction}
-        additionalTableFields={additionalTableFields}
-      />
+      {pendingLoans.length > 0 ? (
+        <React.Fragment>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{ py: 3, mb: 3 }}
+            className="tableheader"
+          >
+            Pending Loans
+          </Typography>
+          <NftListView
+            nfts={pendingLoans}
+            action={pendingLoanAction}
+            additionalTableFields={additionalTableFields}
+          />
+        </React.Fragment>
+      ) : (
+        <React.Fragment />
+      )}
+      {borrowingActivity.length > 0 ? (
+        <React.Fragment>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{ py: 3, my: 3 }}
+            className="tableheader"
+          >
+            Borrowing Activity
+          </Typography>
+          <NftListView
+            nfts={borrowingActivity}
+            action={borrowingActivityAction}
+            additionalTableFields={additionalTableFields}
+          />
+        </React.Fragment>
+      ) : (
+        <React.Fragment />
+      )}
+      {lendingActivity.length > 0 ? (
+        <React.Fragment>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{ py: 3, my: 3 }}
+            className="tableheader"
+          >
+            Lending Activity
+          </Typography>
+          <NftListView
+            nfts={lendingActivity}
+            action={lendingActivityAction}
+            additionalTableFields={additionalTableFields}
+          />
+        </React.Fragment>
+      ) : (
+        <React.Fragment />
+      )}
       <Modal open={!!modalState} onClose={closeModal}>
         <Box sx={modalStyle}>
           <Typography variant="h6" component="div">
