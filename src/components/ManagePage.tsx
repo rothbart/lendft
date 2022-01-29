@@ -4,8 +4,8 @@ import { Box, Button, Typography } from '@mui/material';
 
 import { useWallet } from "../WalletProvider";
 import { getDebtorLoans, cancelLoan } from "../utils/Contract";
-import { LoanStatus } from '../constants/Contract';
-import { getNftInfo } from "../helpers";
+import { LoanStatus, LENDFT_ADDRESS } from '../constants/Contract';
+import { getNFTs } from "../helpers";
 
 import NftListView from "./shared/NftListView";
 import { modalStyle } from "./shared/styles";
@@ -14,40 +14,60 @@ const ManagePage = () => {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [activeLoan, setActiveLoan] = useState<any>(null);
     const [debtorLoans, setDebtorLoans] = useState<any>([]);
+    const [contractNfts, setContractNfts] = useState<any>([]);
 
     const wallet = useWallet();
 
+    if (!wallet) {
+        return <div>Connect wallet</div>;
+    }
+
     useEffect(() => {
-        const getLoans = async () => {
+        const getData = async () => {
             // TODO: Add lender loans here
+
+            // Fetch loans and NFTs on the contract so we don't
+            // hit opensea api for every loan. we will hydrate the loan
+            // information below with the data on the NFT
             const loans = await getDebtorLoans(wallet);
+            const nftsOnContract = await getNFTs(LENDFT_ADDRESS, wallet.isRinkeby);
 
-            const hydratedLoans = await Promise.all(loans.map(async (loan: any) => {
-                const response = await getNftInfo(loan.nftContractAddress, loan.nftId);
-                const nftInfo = response.data;
-
-                return {
-                    name: nftInfo.name,
-                    id: parseInt(loan.nftId._hex, 16),
-                    contract_address: loan.nftContractAddress,
-                    status: LoanStatus[loan.status],
-                    image_url: nftInfo.image_thumbnail_url,
-                    permalink: nftInfo.permalink,
-                    principal: parseInt(loan.principal._hex, 16),
-                    loanId: parseInt(loan.loanId._hex, 16),
-                    interestRate: parseInt(loan.interestRate._hex, 16),
-                };
-            }));
-
-            setDebtorLoans(hydratedLoans);
+            setDebtorLoans(loans);
+            setContractNfts(nftsOnContract);
         }
 
-        getLoans();
+        getData();
     }, [])
 
-    if (debtorLoans.length == 0) {
+    if (debtorLoans.length === 0) {
         return <div>No loans</div>;
     }
+
+    if (contractNfts.length === 0) {
+        return <div>Loading</div>;
+    }
+
+    const hydratedDebtorLoans = debtorLoans.map((debtorLoan: any) => {
+        const nft = contractNfts.find((contractNft: any) => {
+            return parseInt(debtorLoan.nftId._hex, 16) === contractNft.id;
+        })
+
+        if (!nft) {
+            return null
+        }
+
+        return {
+            name: nft.name,
+            id: parseInt(debtorLoan.nftId._hex, 16),
+            contract_address: debtorLoan.nftContractAddress,
+            status: LoanStatus[debtorLoan.status],
+            image_url: nft.image_url,
+            permalink: nft.permalink,
+            principal: parseInt(debtorLoan.principal._hex, 16),
+            loanId: parseInt(debtorLoan.loanId._hex, 16),
+            interestRate: parseInt(debtorLoan.interestRate._hex, 16),
+        };
+    }).filter((hydratedDebtorLoan: any) => !!hydratedDebtorLoan)
 
     const pendingLoanAction = {
         name: "Cancel Loan",
@@ -57,7 +77,7 @@ const ManagePage = () => {
         }
     }
 
-    const pendingLoans = debtorLoans.filter((debtorLoan: any) => debtorLoan.status == 'PENDING');
+    const pendingLoans = hydratedDebtorLoans.filter((debtorLoan: any) => debtorLoan.status == 'PENDING');
 
     const closeModal = () => {
         setModalOpen(false);
@@ -68,10 +88,12 @@ const ManagePage = () => {
         {
             name: 'Amount',
             attribute: 'principal',
+            displayFn: (value: any) => `${value/(10 ** 9)}`
         },
         {
             name: 'Interest rate',
             attribute: 'interestRate',
+            displayFn: (value: any) => `${value/100}%`
         }
     ]
 

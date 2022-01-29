@@ -50,7 +50,11 @@ const NftListView = (props: any) => {
                             </a>
                         </th>
                         <td className="cell">{nft.id}</td>
-                        { additionalTableFields.map((tableField: any) => <td key={tableField.attribute} className="cell">{nft[tableField.attribute]}</td>) }
+                        { additionalTableFields.map((tableField: any) => {
+                            return <td key={tableField.attribute} className="cell">
+                                {tableField.displayFn ? tableField.displayFn(nft[tableField.attribute]) : nft[tableField.attribute]}
+                            </td>
+                        })}
                         { action && <Button onClick={() => { action.onClick(nft) }}>{action.name}</Button>}
                         </tr>
                     );
