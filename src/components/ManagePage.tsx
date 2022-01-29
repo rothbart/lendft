@@ -88,7 +88,7 @@ const ManagePage = () => {
         {
             name: 'Amount',
             attribute: 'principal',
-            displayFn: (value: any) => `${value/(10 ** 18)}`
+            displayFn: (value: any) => `${value/(10 ** 9)}`
         },
         {
             name: 'Interest rate',
