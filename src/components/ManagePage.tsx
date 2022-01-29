@@ -22,25 +22,25 @@ const ManagePage = () => {
         return <div>Connect wallet</div>;
     }
 
+    const getData = async () => {
+        // TODO: Add lender loans here
+
+        // Fetch loans and NFTs on the contract so we don't
+        // hit opensea api for every loan. we will hydrate the loan
+        // information below with the data on the NFT
+        const loanIds = await getDebtorLoanIds(wallet);
+        const nftsOnContract = await getNFTs(LENDFT_ADDRESS, wallet.isRinkeby);
+
+        const debtorLoans = await Promise.all(loanIds.map(async (loanId: any) => {
+            const loan = await getLoan(wallet, parseInt(loanId._hex, 16));
+            return loan;
+        }))
+
+        setDebtorLoans(debtorLoans);
+        setContractNfts(nftsOnContract);
+    }
+
     useEffect(() => {
-        const getData = async () => {
-            // TODO: Add lender loans here
-
-            // Fetch loans and NFTs on the contract so we don't
-            // hit opensea api for every loan. we will hydrate the loan
-            // information below with the data on the NFT
-            const loanIds = await getDebtorLoanIds(wallet);
-            const nftsOnContract = await getNFTs(LENDFT_ADDRESS, wallet.isRinkeby);
-
-            const debtorLoans = await Promise.all(loanIds.map(async (loanId: any) => {
-                const loan = await getLoan(wallet, parseInt(loanId._hex, 16));
-                return loan;
-            }))
-
-            setDebtorLoans(debtorLoans);
-            setContractNfts(nftsOnContract);
-        }
-
         getData();
     }, [])
 
@@ -110,6 +110,7 @@ const ManagePage = () => {
         await cancelLoan(wallet, activeLoan.loanId);
 
         closeModal();
+        getData();
     }
 
     return (
