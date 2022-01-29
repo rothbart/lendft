@@ -5,7 +5,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { useWallet } from "../WalletProvider";
 import { getDebtorLoans, cancelLoan } from "../utils/Contract";
 import { LoanStatus, LENDFT_ADDRESS } from '../constants/Contract';
-import { getNftInfo, getNFTs } from "../helpers";
+import { getNFTs } from "../helpers";
 
 import NftListView from "./shared/NftListView";
 import { modalStyle } from "./shared/styles";
