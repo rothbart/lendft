@@ -44,7 +44,14 @@ const BorrowPage = (props: any) => {
             return;
         }
 
-        await createPendingLoan(wallet, loanAmount, interestRate, activeNft.contract_address, activeNft.id, loanDuration);
+        await createPendingLoan(
+            wallet, 
+            loanAmount * 10 ** 9, // convert to wei
+            interestRate * 100, // convert to bps
+            activeNft.contract_address, 
+            activeNft.id, 
+            loanDuration == 0 ? 1 : loanDuration * 24 * 60 * 60 // convert days to seconds. If zero is entered create a one second loan for demo purposes
+        );
 
         closeModal();
     }
@@ -69,7 +76,7 @@ const BorrowPage = (props: any) => {
                         fullWidth
                         sx={textFieldStyle}
                         type="number"
-                        label="Loan Amount (USDC)"
+                        label="Loan Amount (ETH)"
                         value={loanAmount}
                         onChange={e => setLoanAmount(parseInt(e.target.value))}
                     />
@@ -85,7 +92,7 @@ const BorrowPage = (props: any) => {
                         fullWidth
                         sx={textFieldStyle}
                         type="number"
-                        label="Loan Duration (Seconds)"
+                        label="Loan Duration (Days)"
                         value={loanDuration}
                         onChange={e => setLoanDuration(parseInt(e.target.value))}
                     />
