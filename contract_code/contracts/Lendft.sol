@@ -202,6 +202,10 @@ contract Lendft {
         return loanIdsByDebtor[msg.sender];
     }
 
+    function getLoans() external view returns(Loan[] memory) {
+        return loans;
+    }
+
     function selfDestruct() external {
         selfdestruct(payable(msg.sender));
     }
