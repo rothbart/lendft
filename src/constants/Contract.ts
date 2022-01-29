@@ -1,6 +1,12 @@
 export const LENDFT_ADDRESS = "0xCa654f21C4a49e57C2c98caaB163F3E2Ff01119E";
 
-export const LoanStatus = ["PENDING", "ACTIVE", "SETTLED", "CANCELLED"];
+export enum LoanStatus {
+  PENDING = 0,
+  ACTIVE = 1,
+  SETTLED = 2,
+  CANCELLED = 3,
+}
+//export const LoanStatus = ["PENDING", "ACTIVE", "SETTLED", "CANCELLED"];
 
 export const LENDFT_ABI = [
   {

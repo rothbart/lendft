@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal from "@mui/material/Modal";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 
 import { useWallet } from "../WalletProvider";
 import { cancelLoan, getLoans } from "../utils/Contract";
@@ -9,11 +9,14 @@ import { getNFTs } from "../helpers";
 
 import NftListView from "./shared/NftListView";
 import { modalStyle } from "./shared/styles";
+import { parseLoanInfo } from "./shared/util";
 
 const ManagePage = () => {
-  const [lenderLoans, setLenderLoans] = useState<any[]>([]);
-  const [debtorLoans, setDebtorLoans] = useState<any[]>([]);
-  const [contractNfts, setContractNfts] = useState<any[]>([]);
+  const [pageState, setPageState] = useState<{
+    pendingLoans: any[];
+    borrowingActivity: any[];
+    lendingActivity: any[];
+  } | null>(null);
   const [modalState, setModalState] = useState<{
     title: string;
     buttonText: string;
@@ -28,73 +31,63 @@ const ManagePage = () => {
   }
 
   const getData = async () => {
-    // TODO: Add lender loans here
-
     // Fetch loans and NFTs on the contract so we don't
     // hit opensea api for every loan. we will hydrate the loan
     // information below with the data on the NFT
     const allLoans = await getLoans(wallet);
-    const nftsOnContract = await getNFTs(LENDFT_ADDRESS, wallet.isRinkeby);
+    const walletContractNFTs = await getNFTs(LENDFT_ADDRESS, wallet.isRinkeby);
 
-    /*
-      const loanIds = await getDebtorLoanIds(wallet);
-      const debtorLoans = await Promise.all(
-        loanIds.map(async (loanId: any) => {
-          const loan = await getLoan(wallet, parseInt(loanId._hex, 16));
-          return loan;
-        })
-      );*/
-
-    const debtorLoans = allLoans.filter(
-      (loan: any) => loan.debtorAddress == wallet.address
-    );
-    const lenderLoans = allLoans.filter(
-      (loan: any) => loan.lenderAddress == wallet.address
+    const pendingLoans = parseLoanInfo(
+      walletContractNFTs,
+      allLoans.filter(
+        (loan: any) =>
+          loan.debtorAddress == wallet.address &&
+          loan.status === LoanStatus.PENDING
+      )
     );
 
-    setDebtorLoans(debtorLoans);
-    setLenderLoans(lenderLoans);
-    setContractNfts(nftsOnContract);
+    const borrowingActivity = parseLoanInfo(
+      walletContractNFTs,
+      allLoans.filter(
+        (loan: any) =>
+          loan.debtorAddress == wallet.address &&
+          loan.status === LoanStatus.ACTIVE
+      )
+    );
+
+    const lendingActivity = parseLoanInfo(
+      walletContractNFTs,
+      allLoans.filter(
+        (loan: any) =>
+          loan.lenderAddress == wallet.address &&
+          loan.status === LoanStatus.ACTIVE
+      )
+    );
+
+    setPageState({ pendingLoans, borrowingActivity, lendingActivity });
   };
 
   useEffect(() => {
     getData();
   }, []);
 
-  if (debtorLoans.length === 0 && lenderLoans.length === 0) {
-    return <div>No borrowing or lending activity detected</div>;
+  if (!pageState) {
+    return <CircularProgress />;
   }
 
-  if (contractNfts.length === 0) {
-    return <div>Loading</div>;
+  const {
+    pendingLoans: pending,
+    borrowingActivity: borrowing,
+    lendingActivity: lending,
+  } = pageState;
+
+  if (pending.length === 0 && borrowing.length === 0 && lending.length === 0) {
+    return (
+      <Typography align="center" variant="h5" sx={{ py: 3 }}>
+        No borrowing or lending activity detected.
+      </Typography>
+    );
   }
-
-  const hydratedDebtorLoans = debtorLoans
-    .map((debtorLoan: any) => {
-      const nft = contractNfts.find((contractNft: any) => {
-        return parseInt(debtorLoan.nftId._hex, 16) === contractNft.id;
-      });
-
-      if (!nft) {
-        return null;
-      }
-
-      return {
-        name: nft.name,
-        id: parseInt(debtorLoan.nftId._hex, 16),
-        contract_address: debtorLoan.nftContractAddress,
-        status: LoanStatus[debtorLoan.status],
-        image_url: nft.image_url,
-        permalink: nft.permalink,
-        principal: parseInt(debtorLoan.principal._hex, 16),
-        loanId: parseInt(debtorLoan.loanId._hex, 16),
-        interestRate: parseInt(debtorLoan.interestRate._hex, 16),
-      };
-    })
-    .filter((hydratedDebtorLoan: any) => !!hydratedDebtorLoan);
-
-  // TODO: hydrate these the same way we're doing for debtor loans
-  const hydratedLenderLoans: any[] = [];
 
   const pendingLoanAction = {
     name: "Cancel Loan",
@@ -136,16 +129,6 @@ const ManagePage = () => {
     },
   };
 
-  const pendingLoans = hydratedDebtorLoans.filter(
-    (loan: any) => loan.status == "PENDING"
-  );
-  const borrowingActivity = hydratedDebtorLoans.filter(
-    (loan: any) => loan.status == "ACTIVE"
-  );
-  const lendingActivity = hydratedLenderLoans.filter(
-    (loan: any) => loan.status == "ACTIVE"
-  );
-
   const closeModal = () => {
     setModalState(null);
   };
@@ -165,7 +148,7 @@ const ManagePage = () => {
 
   return (
     <React.Fragment>
-      {pendingLoans.length > 0 ? (
+      {pending.length > 0 ? (
         <React.Fragment>
           <Typography
             variant="h5"
@@ -176,7 +159,7 @@ const ManagePage = () => {
             Pending Loans
           </Typography>
           <NftListView
-            nfts={pendingLoans}
+            nfts={pending}
             action={pendingLoanAction}
             additionalTableFields={additionalTableFields}
           />
@@ -184,7 +167,7 @@ const ManagePage = () => {
       ) : (
         <React.Fragment />
       )}
-      {borrowingActivity.length > 0 ? (
+      {borrowing.length > 0 ? (
         <React.Fragment>
           <Typography
             variant="h5"
@@ -195,7 +178,7 @@ const ManagePage = () => {
             Borrowing Activity
           </Typography>
           <NftListView
-            nfts={borrowingActivity}
+            nfts={borrowing}
             action={borrowingActivityAction}
             additionalTableFields={additionalTableFields}
           />
@@ -203,7 +186,7 @@ const ManagePage = () => {
       ) : (
         <React.Fragment />
       )}
-      {lendingActivity.length > 0 ? (
+      {lending.length > 0 ? (
         <React.Fragment>
           <Typography
             variant="h5"
@@ -214,7 +197,7 @@ const ManagePage = () => {
             Lending Activity
           </Typography>
           <NftListView
-            nfts={lendingActivity}
+            nfts={lending}
             action={lendingActivityAction}
             additionalTableFields={additionalTableFields}
           />
