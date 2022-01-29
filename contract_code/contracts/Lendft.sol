@@ -11,6 +11,7 @@ contract Lendft {
         Cancelled
     }
 
+
     //Loan struct
     struct Loan {
         uint loanId;
@@ -70,6 +71,24 @@ contract Lendft {
     modifier isValidDebtor(address callerAddress, uint loanId) {
         require(loans[loanId].debtorAddress== callerAddress, "Caller is not the debtor for this loan");
         _;
+    }
+
+    function getPendingLoans() external view returns(uint){
+        return loans.length;
+    }
+
+    function getLoanDetails(uint loanId) external view 
+        returns(uint, uint, address, uint, LoanState){
+        return (
+        loans[loanId].principal,
+        loans[loanId].interestRate,
+        loans[loanId].nftContractAddress,
+        loans[loanId].maturityInSeconds,
+        loans[loanId].status);
+    }
+
+    function getAllLoans() public view returns(Loan[] memory){
+        return loans;
     }
 
     function createPendingLoan(

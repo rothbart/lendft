@@ -33,7 +33,7 @@ const ALCHEMY_API_KEY = "9PrZHqM5u1Mf6rFHbMeYQnpGS2MouOgZ";
 const RINKEBY_PRIVATE_KEY = "2d5a30a484b43bb305e2f92507c0cf81479e959125058d964c22a96ab543bacb";
 
 module.exports = {
-  solidity: "0.8.4",
+  solidity: "0.8.0",
   networks: {
     rinkeby: {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
