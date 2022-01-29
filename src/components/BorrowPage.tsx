@@ -78,7 +78,7 @@ const BorrowPage = (props: any) => {
                         type="number"
                         label="Loan Amount (ETH)"
                         value={loanAmount}
-                        onChange={e => setLoanAmount(parseInt(e.target.value))}
+                        onChange={e => setLoanAmount(parseFloat(e.target.value))}
                     />
                     <TextField
                         fullWidth

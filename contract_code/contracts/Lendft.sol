@@ -32,7 +32,7 @@ contract Lendft {
 
     Loan[] public loans;
     mapping (address => mapping (address => mapping (uint => bool))) debtorHasActiveLoan;
-    mapping (address => Loan[]) public loansByDebtor;
+    mapping (address => uint[]) public loanIdsByDebtor;
 
     modifier validateLoanTermInputs(uint principal, uint interestRate, uint maturityInSeconds) {
         require(principal > 0, "Principal needs to be greater than zero");
@@ -107,7 +107,7 @@ contract Lendft {
         loans.push(loan);
         debtorHasActiveLoan[msg.sender][nftContractAddress][nftId] = true;
 
-        loansByDebtor[msg.sender].push(loan);
+        loanIdsByDebtor[msg.sender].push(loanId);
 
         emit LoanCreated(loanId, msg.sender);
 
@@ -198,8 +198,8 @@ contract Lendft {
 
     }
 
-    function getDebtorLoans() external view returns(Loan[] memory) {
-        return loansByDebtor[msg.sender];
+    function getDebtorLoanIds() external view returns(uint[] memory) {
+        return loanIdsByDebtor[msg.sender];
     }
 
     function selfDestruct() external {

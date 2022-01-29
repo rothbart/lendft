@@ -3,7 +3,7 @@ import Modal from '@mui/material/Modal';
 import { Box, Button, Typography } from '@mui/material';
 
 import { useWallet } from "../WalletProvider";
-import { getDebtorLoans, cancelLoan } from "../utils/Contract";
+import { getDebtorLoanIds, cancelLoan, getLoan } from "../utils/Contract";
 import { LoanStatus, LENDFT_ADDRESS } from '../constants/Contract';
 import { getNFTs } from "../helpers";
 
@@ -29,10 +29,15 @@ const ManagePage = () => {
             // Fetch loans and NFTs on the contract so we don't
             // hit opensea api for every loan. we will hydrate the loan
             // information below with the data on the NFT
-            const loans = await getDebtorLoans(wallet);
+            const loanIds = await getDebtorLoanIds(wallet);
             const nftsOnContract = await getNFTs(LENDFT_ADDRESS, wallet.isRinkeby);
 
-            setDebtorLoans(loans);
+            const debtorLoans = await Promise.all(loanIds.map(async (loanId: any) => {
+                const loan = await getLoan(wallet, parseInt(loanId._hex, 16));
+                return loan;
+            }))
+
+            setDebtorLoans(debtorLoans);
             setContractNfts(nftsOnContract);
         }
 
