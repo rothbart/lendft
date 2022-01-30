@@ -3,7 +3,7 @@ import Modal from "@mui/material/Modal";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 
 import { useWallet } from "../WalletProvider";
-import { cancelLoan, getLoans } from "../utils/Contract";
+import { cancelLoan, getLoans, repayLoan, claimCollateral } from "../utils/Contract";
 import { LoanStatus, LENDFT_ADDRESS } from "../constants/Contract";
 import { getNFTs } from "../helpers";
 
@@ -58,9 +58,16 @@ const ManagePage = () => {
     const lendingActivity = parseLoanInfo(
       walletContractNFTs,
       allLoans.filter(
-        (loan: any) =>
-          loan.lenderAddress == wallet.address &&
-          loan.status === LoanStatus.ACTIVE
+        (loan: any) => {
+          const startTime = parseInt(loan.startTime._hex, 16);
+          const maturityInSeconds = parseInt(loan.maturityInSeconds._hex, 16);
+          const currentTime = new Date().getTime() / 1000;
+          const isExpired = currentTime > (startTime + maturityInSeconds);
+
+          return loan.lenderAddress == wallet.address &&
+            loan.status === LoanStatus.ACTIVE &&
+            isExpired
+        }
       )
     );
 
@@ -111,7 +118,11 @@ const ManagePage = () => {
       setModalState({
         title: "Are you sure you want to repay this loan?",
         buttonText: "Repay Loan",
-        action: async () => closeModal(), // TODO: wire up action
+        action: async () => {
+          await repayLoan(wallet, loan.loanId, loan.principal);
+          closeModal();
+          getData();
+        }, 
         activeLoan: loan,
       });
     },
@@ -123,7 +134,11 @@ const ManagePage = () => {
       setModalState({
         title: "Are you sure you want to claim the collateral for this loan?",
         buttonText: "Claim collateral",
-        action: async () => closeModal(), // TODO: wire up action
+        action: async () => {
+          await claimCollateral(wallet, loan.loanId);
+          closeModal();
+          getData();
+        }, 
         activeLoan: loan,
       });
     },
