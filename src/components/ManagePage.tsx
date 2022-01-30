@@ -35,7 +35,6 @@ const ManagePage = () => {
     // hit opensea api for every loan. we will hydrate the loan
     // information below with the data on the NFT
     const allLoans = await getLoans(wallet);
-    console.log(allLoans);
     const walletContractNFTs = await getNFTs(LENDFT_ADDRESS, wallet.isRinkeby);
 
     const pendingLoans = parseLoanInfo(
