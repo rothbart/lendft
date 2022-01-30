@@ -184,7 +184,7 @@ contract Lendft {
 
         // Transfer ETH tokens to borrower
         
-        (bool sent, ) = loans[loanId].debtorAddress.call{value: loans[loanId].principal}("");
+        (bool sent, ) = payable(loans[loanId].debtorAddress).call{value: loans[loanId].principal * (10 ** 9)}("");
 
         // change status to active
         loans[loanId].status = LoanState.Active;
