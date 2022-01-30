@@ -1,4 +1,4 @@
-export const LENDFT_ADDRESS = "0x920FdeD16D12E937dF234aa5d257B367c3eA7fb8";
+export const LENDFT_ADDRESS = "0x0282B35Fb4dc1C90aa32dDF4DF2C932Bb6e4c273";
 
 export enum LoanStatus {
   PENDING = 0,

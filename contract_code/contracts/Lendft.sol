@@ -156,6 +156,8 @@ contract Lendft {
         
         debtorHasActiveLoan[loans[loanId].debtorAddress][loans[loanId].nftContractAddress][loans[loanId].nftId] = false;
 
+        loans[loanId].status = LoanState.Settled;
+
         emit LoanRepaid(loanId);
 
         return sent;
@@ -173,6 +175,7 @@ contract Lendft {
         uint nftId = loans[loanId].nftId;
         IERC721 tokenContract = IERC721(nftContractAddress);
         tokenContract.transferFrom(address(this), msg.sender, nftId);
+        loans[loanId].status = LoanState.Settled;
         return nftId;
     }
 

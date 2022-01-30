@@ -1,7 +1,8 @@
 export function parseLoanInfo(contractNFTs: any[], loans: any[]): any[] {
   const parsedLoans = loans.map((loan: any) => {
     const loanNFT = contractNFTs.find((nft: any) => {
-      return parseInt(loan.nftId._hex, 16) === nft.id;
+      return parseInt(loan.nftId._hex, 16) === nft.id && 
+        loan.nftContractAddress.toLowerCase() === nft.contract_address.toLowerCase();
     });
 
     if (!loanNFT) {

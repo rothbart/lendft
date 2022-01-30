@@ -120,3 +120,34 @@ export const initiateLoan = async (wallet: any, loanId: number, amount: number) 
         console.log("lendft initiateLoan transaction failed", err)
     }
 }
+
+export const repayLoan = async (wallet: any, loanId: number, amount: number) => {
+    const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
+
+    if (!wallet || !lendftContract) {
+        return null;
+    }
+
+    try {
+        const options = {value: ethers.utils.parseEther((amount / 10**9).toString())}
+        const transaction = await lendftContract.repayLoan(loanId, options);
+        await transaction.wait();
+    } catch (err) {
+        console.log("lendft repayLoan transaction failed", err)
+    }
+}
+
+export const claimCollateral = async (wallet: any, loanId: number) => {
+    const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
+
+    if (!wallet || !lendftContract) {
+        return null;
+    }
+
+    try {
+        const transaction = await lendftContract.claimCollateral(loanId);
+        await transaction.wait();
+    } catch (err) {
+        console.log("lendft claimCollateral transaction failed", err)
+    }
+}
