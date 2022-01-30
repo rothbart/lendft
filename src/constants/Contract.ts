@@ -1,4 +1,4 @@
-export const LENDFT_ADDRESS = "0xCa654f21C4a49e57C2c98caaB163F3E2Ff01119E";
+export const LENDFT_ADDRESS = "0x920FdeD16D12E937dF234aa5d257B367c3eA7fb8";
 
 export const LoanStatus = ["PENDING", "ACTIVE", "SETTLED", "CANCELLED"];
 
