@@ -141,12 +141,12 @@ contract Lendft {
         // I think we can allow anyone to repay a loan
         
         // Validate debtor has enough capital
-        uint yearsElapsed = (block.timestamp - loans[loanId].startTime) / 365 days;
-        uint loanBalance = loans[loanId].principal + loans[loanId].interestRate * yearsElapsed;
+        // For now, just use the loan principal
+        uint loanBalance = loans[loanId].principal * 10 ** 9;
         require(loanBalance <= msg.value, "insufficient funds to repay loan");
         
         // Credit gets paid principal and interest
-        (bool sent, ) = loans[loanId].lenderAddress.call{value: loanBalance}("");
+        (bool sent, ) = payable(loans[loanId].lenderAddress).call{value: loanBalance}("");
         
         // Debtor gets back NFT
         if (sent) {
