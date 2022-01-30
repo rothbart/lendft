@@ -24,6 +24,7 @@ import { useWallet } from "./WalletProvider";
 
 import BorrowPage from "./components/BorrowPage";
 import ManagePage from "./components/ManagePage";
+import LendPage from "./components/LendPage";
 
 import "./App.css";
 
@@ -77,7 +78,7 @@ function App() {
           <Route path="/">
             <Route index element={<div>Welcome to LendFT</div>} />
             <Route path={PAGE_ROUTE_BORROW} element={<BorrowPage nfts={nfts} />} />
-            <Route path={PAGE_ROUTE_LEND} element={<div>Lend</div>} />
+            <Route path={PAGE_ROUTE_LEND} element={<LendPage />} />
             <Route path={PAGE_ROUTE_MANAGE} element={<ManagePage />} />
           </Route>
         </Routes>

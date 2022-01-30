@@ -192,6 +192,9 @@ contract Lendft {
         //start the clock
         loans[loanId].startTime = block.timestamp;
 
+        // specify the lender
+        loans[loanId].lenderAddress = msg.sender;
+
         emit LoanInitiated(loanId, msg.sender);
 
         return sent;

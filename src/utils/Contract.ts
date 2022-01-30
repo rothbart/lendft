@@ -104,3 +104,19 @@ export const getLoans = async (wallet: any) => {
         console.log("lendft getLoans transaction failed", err)
     }
 }
+
+export const initiateLoan = async (wallet: any, loanId: number, amount: number) => {
+    const lendftContract = getContract(wallet, LENDFT_ADDRESS, LENDFT_ABI);
+
+    if (!wallet || !lendftContract) {
+        return null;
+    }
+
+    try {
+        const options = {value: ethers.utils.parseEther((amount / 10**9).toString())}
+        const transaction = await lendftContract.initiateLoan(loanId, options);
+        await transaction.wait();
+    } catch (err) {
+        console.log("lendft initiateLoan transaction failed", err)
+    }
+}
